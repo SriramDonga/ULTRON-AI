@@ -1,24 +1,28 @@
 from core.brain import UltronBrain
+from voice.listener import UltronListener
+from voice.speaker import UltronSpeaker
 
 
 def main():
-    ultron = UltronBrain()
+    brain = UltronBrain()
+    listener = UltronListener()
+    speaker = UltronSpeaker()
 
-    print("================================")
-    print("        ULTRON AI v0.1")
-    print("================================")
-    print("Type 'exit' to quit.")
+    speaker.speak("ULTRON voice system initialized.")
 
     while True:
-        command = input("You: ")
+        command = listener.listen()
+
+        if not command:
+            continue
 
         if command.lower() == "exit":
-            print("ULTRON: Goodbye.")
+            speaker.speak("Goodbye.")
             break
 
-        response = ultron.think(command)
+        response = brain.think(command)
 
-        print(f"ULTRON: {response}")
+        speaker.speak(response)
 
 
 if __name__ == "__main__":
