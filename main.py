@@ -1,12 +1,14 @@
 from core.brain import UltronBrain
 from voice.listener import UltronListener
 from voice.speaker import UltronSpeaker
+from automation.system_control import SystemController
 
 
 def main():
     brain = UltronBrain()
     listener = UltronListener()
     speaker = UltronSpeaker()
+    controller = SystemController()
 
     speaker.speak("ULTRON voice system initialized.")
 
@@ -20,9 +22,16 @@ def main():
             speaker.speak("Goodbye.")
             break
 
-        response = brain.think(command)
+        result = brain.think(command)
 
-        speaker.speak(response)
+        if result["type"] == "response":
+            speaker.speak(result["message"])
+
+        elif result["type"] == "action":
+
+            if result["action"] == "open_calculator":
+                response = controller.open_calculator()
+                speaker.speak(response)
 
 
 if __name__ == "__main__":

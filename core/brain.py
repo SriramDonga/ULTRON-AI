@@ -10,13 +10,31 @@ class UltronBrain:
         command = command.lower()
 
         if "hello" in command:
-            return "Hello. I am ULTRON."
+            return {
+                "type": "response",
+                "message": "Hello. I am ULTRON."
+            }
 
         elif "who are you" in command:
-            return "I am ULTRON, your personal AI assistant."
+            return {
+                "type": "response",
+                "message": "I am ULTRON, your personal AI assistant."
+            }
 
         elif "how are you" in command:
-            return "All systems are operational."
+            return {
+                "type": "response",
+                "message": "All systems are operational."
+            }
+
+        elif "open calculator" in command or "open calculator" in command:
+            return {
+                "type": "action",
+                "action": "open_calculator"
+            }
 
         else:
-            return "I don't know how to handle that command yet."
+            return {
+                "type": "response",
+                "message": "I don't know how to handle that command yet."
+            }
