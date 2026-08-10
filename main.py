@@ -18,7 +18,7 @@ def main():
         if not command:
             continue
 
-        if command.lower() == "exit":
+        if command.lower().strip() == "exit":
             speaker.speak("Goodbye.")
             break
 
@@ -31,7 +31,23 @@ def main():
 
             if result["action"] == "open_calculator":
                 response = controller.open_calculator()
-                speaker.speak(response)
+
+            elif result["action"] == "open_notepad":
+                response = controller.open_notepad()
+
+            elif result["action"] == "open_browser":
+                response = controller.open_browser()
+
+            elif result["action"] == "get_time":
+                response = controller.get_time()
+
+            elif result["action"] == "get_date":
+                response = controller.get_date()
+
+            else:
+                response = "I don't know how to perform that action yet."
+
+            speaker.speak(response)
 
 
 if __name__ == "__main__":
