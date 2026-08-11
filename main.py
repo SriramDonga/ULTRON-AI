@@ -1,51 +1,171 @@
 from core.brain import UltronBrain
 from voice.listener import UltronListener
 from voice.speaker import UltronSpeaker
+
 from automation.system_control import SystemController
+from automation.app_controller import AppController
+
+from browser.browser_controller import BrowserController
+
+
+def calculate_expression(expression):
+
+    try:
+
+        expression = expression.lower()
+
+        expression = expression.replace("×", "*")
+        expression = expression.replace("x", "*")
+        expression = expression.replace("÷", "/")
+
+        allowed = "0123456789+-*/(). "
+
+        expression = "".join(
+            char
+            for char in expression
+            if char in allowed
+        )
+
+        result = eval(
+            expression,
+            {"__builtins__": {}}
+        )
+
+        return f"The answer is {result}."
+
+    except Exception:
+
+        return "I could not calculate that expression."
 
 
 def main():
+
     brain = UltronBrain()
     listener = UltronListener()
     speaker = UltronSpeaker()
-    controller = SystemController()
 
-    speaker.speak("ULTRON voice system initialized.")
+    system = SystemController()
+    app = AppController()
+    browser = BrowserController()
+
+    speaker.speak(
+        "ULTRON voice system initialized."
+    )
 
     while True:
+
         command = listener.listen()
 
         if not command:
             continue
 
-        if command.lower().strip() == "exit":
-            speaker.speak("Goodbye.")
-            break
-
         result = brain.think(command)
 
+        # --------------------------------
+        # NORMAL RESPONSE
+        # --------------------------------
+
         if result["type"] == "response":
-            speaker.speak(result["message"])
+
+            speaker.speak(
+                result["message"]
+            )
+
+        # --------------------------------
+        # EXIT
+        # --------------------------------
+
+        elif result["type"] == "exit":
+
+            speaker.speak(
+                "Goodbye."
+            )
+
+            break
+
+        # --------------------------------
+        # ACTION
+        # --------------------------------
 
         elif result["type"] == "action":
 
-            if result["action"] == "open_calculator":
-                response = controller.open_calculator()
+            action = result["action"]
 
-            elif result["action"] == "open_notepad":
-                response = controller.open_notepad()
+            # Calculator
+            if action == "open_calculator":
 
-            elif result["action"] == "open_browser":
-                response = controller.open_browser()
+                response = app.open_calculator()
 
-            elif result["action"] == "get_time":
-                response = controller.get_time()
+            # Calculate
+            elif action == "calculate":
 
-            elif result["action"] == "get_date":
-                response = controller.get_date()
+                response = calculate_expression(
+                    result["expression"]
+                )
+
+            # Notepad
+            elif action == "open_notepad":
+
+                response = app.open_notepad()
+
+            # Write into Notepad
+            elif action == "write_notepad":
+
+                response = app.open_notepad()
+
+                app.type_text(
+                    result["text"]
+                )
+
+                response = (
+                    "I opened Notepad and typed your message."
+                )
+
+            # Browser
+            elif action == "open_browser":
+
+                response = app.open_browser()
+
+            # Google
+            elif action == "open_google":
+
+                response = browser.open_google()
+
+            # YouTube
+            elif action == "open_youtube":
+
+                response = browser.open_youtube()
+
+            # Google Search
+            elif action == "search_google":
+
+                response = browser.search_google(
+                    result["query"]
+                )
+
+            # YouTube Search
+            elif action == "search_youtube":
+
+                response = browser.search_youtube(
+                    result["query"]
+                )
+
+            # Time
+            elif action == "get_time":
+
+                response = system.get_time()
+
+            # Date
+            elif action == "get_date":
+
+                response = system.get_date()
 
             else:
-                response = "I don't know how to perform that action yet."
+
+                response = (
+                    "I don't know how to perform "
+                    "that action yet."
+                )
 
             speaker.speak(response)
 

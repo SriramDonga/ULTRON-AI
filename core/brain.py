@@ -1,73 +1,93 @@
 from core.config import ASSISTANT_NAME
+from core.command_parser import CommandParser
 
 
 class UltronBrain:
 
     def __init__(self):
         self.name = ASSISTANT_NAME
+        self.parser = CommandParser()
 
     def think(self, command):
-        command = command.lower().strip()
 
-        # Greetings
-        if "hello" in command or "hi" in command:
+        command_lower = command.lower()
+
+        parsed = self.parser.parse(command)
+
+        # EXIT
+        if parsed["intent"] == "exit":
+            return {
+                "type": "exit"
+            }
+
+        # GREETING
+        if (
+            "hello" in command_lower
+            or command_lower == "hi"
+            or "hey" in command_lower
+        ):
             return {
                 "type": "response",
                 "message": "Hello. I am ULTRON."
             }
 
-        # Identity
-        elif "who are you" in command:
+        # IDENTITY
+        if "who are you" in command_lower:
             return {
                 "type": "response",
                 "message": "I am ULTRON, your personal AI assistant."
             }
 
-        # Status
-        elif "how are you" in command:
+        # STATUS
+        if "how are you" in command_lower:
             return {
                 "type": "response",
                 "message": "All systems are operational."
             }
 
-        # Calculator
-        elif "calculator" in command:
+        # CALCULATE
+        if parsed["intent"] == "calculate":
             return {
                 "type": "action",
-                "action": "open_calculator"
+                "action": "calculate",
+                "expression": parsed["expression"]
             }
 
-        # Notepad
-        elif "notepad" in command or "note" in command:
+        # OPEN
+        if parsed["intent"] == "open":
+
             return {
                 "type": "action",
-                "action": "open_notepad"
+                "action": f"open_{parsed['target']}"
             }
 
-        # Browser
-        elif "browser" in command or "google" in command:
+        # WRITE
+        if parsed["intent"] == "write":
+
             return {
                 "type": "action",
-                "action": "open_browser"
+                "action": "write_notepad",
+                "text": parsed["text"]
             }
 
-        # Time
-        elif "time" in command:
+        # SEARCH
+        if parsed["intent"] == "search":
+
             return {
                 "type": "action",
-                "action": "get_time"
+                "action": f"search_{parsed['target']}",
+                "query": parsed["query"]
             }
 
-        # Date
-        elif "date" in command or "today" in command:
+        # INFORMATION
+        if parsed["intent"] == "get":
+
             return {
                 "type": "action",
-                "action": "get_date"
+                "action": f"get_{parsed['target']}"
             }
 
-        # Unknown command
-        else:
-            return {
-                "type": "response",
-                "message": "I don't know how to handle that command yet."
-            }
+        return {
+            "type": "response",
+            "message": "I don't know how to handle that command yet."
+        }

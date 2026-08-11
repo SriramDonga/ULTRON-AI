@@ -1,5 +1,4 @@
 import os
-import webbrowser
 from datetime import datetime
 
 
@@ -14,7 +13,7 @@ class SystemController:
         return "Notepad opened."
 
     def open_browser(self):
-        webbrowser.open("https://www.google.com")
+        os.system("start msedge")
         return "Browser opened."
 
     def get_time(self):
